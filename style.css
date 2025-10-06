@@ -19,6 +19,7 @@
 html {
     overflow: hidden;
     height: 100%;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100%;
 }
 
@@ -29,6 +30,7 @@ body {
     line-height: 1.6;
     overflow: hidden;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     margin: 0;
     padding: 0;
@@ -44,6 +46,7 @@ body.is-animating {
 .slides-wrapper {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     position: fixed;
     top: 0;
     left: 0;
@@ -56,8 +59,11 @@ body.is-animating {
 .slide {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     max-height: 100vh;
+    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     position: relative;
     overflow: hidden;
 }
@@ -720,8 +726,11 @@ body.is-animating {
 #hero,
 #destination {
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     max-height: 100vh;
+    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     display: flex;
     flex-direction: column;
@@ -843,6 +852,7 @@ body.is-animating {
 .roadmap-stage {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     flex-shrink: 0;
     display: flex;
     justify-content: center;
@@ -992,8 +1002,11 @@ body.is-animating {
 /* CÂU LẠC BỘ */
 #clubs {
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     max-height: 100vh;
+    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     padding: 80px 5vw 60px 5vw;
     background-color: var(--bg-dark);
@@ -1107,8 +1120,11 @@ body.is-animating {
 /* CƠ HỘI NGHỀ NGHIỆP */
 #jobs {
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     max-height: 100vh;
+    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     padding: 80px 5vw 60px 5vw;
     display: flex;
@@ -1279,6 +1295,7 @@ body.is-animating {
         max-width: 400px;
         height: auto;
         max-height: 35vh;
+        max-height: 35dvh; /* Dynamic viewport height for mobile browsers */
         margin-bottom: 20px;
         flex-shrink: 0;
     }
@@ -1339,8 +1356,11 @@ body.is-animating {
         justify-content: center;
         align-items: center;
         padding: 10vh 15px 15vh 15px;
+        padding: 10dvh 15px 15dvh 15px; /* Dynamic viewport height for mobile browsers */
         height: 100vh;
+        height: 100dvh; /* Dynamic viewport height for mobile browsers */
         max-height: 100vh;
+        max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
         overflow: hidden;
     }
 
@@ -1352,12 +1372,14 @@ body.is-animating {
         display: flex;
         flex-direction: column;
         gap: 2vh;
+        gap: 2dvh; /* Dynamic viewport height for mobile browsers */
         overflow-y: auto;
         overflow-x: hidden;
         width: 100%;
         max-width: 400px;
         height: 100%;
         max-height: 80vh;
+        max-height: 80dvh; /* Dynamic viewport height for mobile browsers */
         align-items: stretch;
         justify-content: flex-start;
         scrollbar-width: thin;
@@ -1384,6 +1406,7 @@ body.is-animating {
         padding: 15px;
         min-height: auto;
         max-height: 25vh;
+        max-height: 25dvh; /* Dynamic viewport height for mobile browsers */
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
@@ -1622,6 +1645,7 @@ body.is-animating {
 
     .stage-image-wrapper {
         max-height: 28vh;
+        max-height: 28dvh; /* Dynamic viewport height for mobile browsers */
         margin-bottom: 15px;
     }
 
@@ -1671,12 +1695,15 @@ body.is-animating {
 
     .clubs-grid {
         gap: 1.1vh;
+        gap: 1.1dvh; /* Dynamic viewport height for mobile browsers */
         max-height: 78vh;
+        max-height: 78dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     .club-card {
         padding: 12px;
         max-height: 24vh;
+        max-height: 24dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     .club-logo {
@@ -1745,6 +1772,7 @@ body.is-animating {
 
     .stage-image-wrapper {
         max-height: 30vh;
+        max-height: 30dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     .stage-year {
@@ -1761,12 +1789,15 @@ body.is-animating {
 
     .clubs-grid {
         gap: 1.4vh;
+        gap: 1.4dvh; /* Dynamic viewport height for mobile browsers */
         max-height: 80vh;
+        max-height: 80dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     .club-card {
         padding: 13px;
         max-height: 25vh;
+        max-height: 25dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     .club-logo {
@@ -1833,6 +1864,7 @@ body.is-animating {
     .stage-image-wrapper {
         width: 95%;
         max-height: 25vh;
+        max-height: 25dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     .stage-year {
@@ -1874,7 +1906,9 @@ body.is-animating {
 
     .clubs-grid {
         gap: 1vh;
+        gap: 1dvh; /* Dynamic viewport height for mobile browsers */
         max-height: 78vh;
+        max-height: 78dvh; /* Dynamic viewport height for mobile browsers */
         padding: 0 !important;
     }
 
@@ -1882,6 +1916,7 @@ body.is-animating {
         padding: 10px;
         max-width: 350px;
         max-height: 24vh;
+        max-height: 24dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     .club-logo {
@@ -1982,10 +2017,12 @@ body.is-animating {
 }
 
 /* Ultra small devices - 375px and below (iPhone SE, small phones) */
-@media (max-width: 375px) {
+@media (max-width: 376px) {
     .clubs-grid {
         gap: 1vh !important;
+        gap: 1dvh !important; /* Dynamic viewport height for mobile browsers */
         max-height: 80vh;
+        max-height: 80dvh; /* Dynamic viewport height for mobile browsers */
         padding: 0 !important;
     }
 
@@ -2031,6 +2068,7 @@ body.is-animating {
     .stage-image-wrapper {
         width: 98%;
         max-height: 22vh;
+        max-height: 22dvh; /* Dynamic viewport height for mobile browsers */
         margin-bottom: 12px;
     }
 
@@ -2127,7 +2165,7 @@ body.is-animating {
     }
 
     .jobs-page.mobile-page .job-card {
-        max-width: 320px;
+        width: 95%;
     }
 
     .job-card h3 {
