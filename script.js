@@ -9,7 +9,8 @@
     // ============ CONSTANTS ============
     const ANIM_TIME = 400; // ms
     const WHEEL_COOLDOWN = 500; // ms - Increased for better control
-    const MOBILE_BREAKPOINT = 900; // px
+    const MOBILE_BREAKPOINT = 9999; // Disable mobile fallback - always use slide mode
+    const TOUCH_THRESHOLD = 50; // Minimum swipe distance
 
     // ============ STATE ============
     let currentSectionIndex = 0;
@@ -18,6 +19,7 @@
     let isAnimating = false;
     let isDesktop = window.innerWidth > MOBILE_BREAKPOINT;
     let viewportHeight = window.innerHeight;
+    let isMobile = window.innerWidth <= 900;
 
     // ============ DOM ELEMENTS ============
     const body = document.body;
@@ -32,6 +34,8 @@
     const jobsNextBtn = document.querySelector('.jobs-next');
     const jobsDots = document.querySelectorAll('.jobs-pagination .jobs-dot');
     const loadingScreen = document.querySelector('.loading-screen');
+    const mobileSectionPrevBtn = document.querySelector('.mobile-section-prev');
+    const mobileSectionNextBtn = document.querySelector('.mobile-section-next');
 
     // ============ PRELOAD IMAGES ============
     const imagesToPreload = [
@@ -67,10 +71,21 @@
         });
     }
 
+    // ============ MOBILE SECTION BUTTONS UPDATE ============
+    function updateMobileSectionButtons() {
+        if (!isMobile) return;
+        
+        if (mobileSectionPrevBtn) {
+            mobileSectionPrevBtn.disabled = currentSectionIndex === 0;
+        }
+        
+        if (mobileSectionNextBtn) {
+            mobileSectionNextBtn.disabled = currentSectionIndex === sections.length - 1;
+        }
+    }
+
     // ============ SECTION CONTROLLER ============
     function goToSection(index, skipAnimation = false) {
-        if (!isDesktop) return;
-        
         const clampedIndex = Math.max(0, Math.min(index, sections.length - 1));
         
         if (clampedIndex === currentSectionIndex && !skipAnimation) return;
@@ -94,6 +109,9 @@
             const translateY = -clampedIndex * viewportHeight;
             slidesWrapper.style.transform = `translate3d(0, ${translateY}px, 0)`;
             
+            // Update mobile section buttons
+            updateMobileSectionButtons();
+            
             // Focus management
             setTimeout(() => {
                 const targetSection = document.querySelector(sections[clampedIndex]);
@@ -114,13 +132,14 @@
                     slidesWrapper.style.transform = `translate3d(0, ${translateY}px, 0)`;
                 });
             }, ANIM_TIME);
+        } else {
+            // Update buttons even when skipping animation
+            updateMobileSectionButtons();
         }
     }
 
     // ============ ROADMAP CONTROLLER ============
     function goToRoadmapStage(index, skipAnimation = false) {
-        if (!isDesktop) return;
-        
         const clampedIndex = Math.max(0, Math.min(index, roadmapStages.length - 1));
         
         if (clampedIndex === currentRoadmapStage && !skipAnimation) return;
@@ -160,9 +179,17 @@
 
     // ============ JOBS PAGINATION CONTROLLER ============
     function goToJobsPage(index, skipAnimation = false) {
-        if (!isDesktop) return;
+        let maxIndex, clampedIndex;
         
-        const clampedIndex = Math.max(0, Math.min(index, jobsPages.length - 1));
+        if (isMobile) {
+            // Mobile: 12 individual pages (0-11)
+            maxIndex = 11;
+            clampedIndex = Math.max(0, Math.min(index, maxIndex));
+        } else {
+            // Desktop: 4 pages (0, 1, 2, 3) with 3 jobs each
+            maxIndex = 3;
+            clampedIndex = Math.max(0, Math.min(index, maxIndex));
+        }
         
         if (clampedIndex === currentJobsPage && !skipAnimation) return;
         
@@ -177,18 +204,33 @@
         
         // Use requestAnimationFrame for smooth rendering
         requestAnimationFrame(() => {
-            const translateX = -clampedIndex * 100;
-            jobsTrack.style.transform = `translate3d(${translateX}%, 0, 0)`;
+            let translateValue;
+            if (isMobile) {
+                // Mobile: Each page is 100vw
+                translateValue = `translate3d(-${clampedIndex * 100}vw, 0, 0)`;
+            } else {
+                // Desktop: Each page is 100% of viewport
+                translateValue = `translate3d(-${clampedIndex * 100}%, 0, 0)`;
+            }
+            jobsTrack.style.transform = translateValue;
             
             // Update dots
             jobsDots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === clampedIndex);
-                dot.setAttribute('aria-selected', i === clampedIndex);
+                let isActive;
+                if (isMobile) {
+                    // Mobile: dots represent groups of 3 (0-2=dot0, 3-5=dot1, 6-8=dot2, 9-11=dot3)
+                    isActive = (i === Math.floor(clampedIndex / 3));
+                } else {
+                    // Desktop: direct mapping
+                    isActive = (i === clampedIndex);
+                }
+                dot.classList.toggle('active', isActive);
+                dot.setAttribute('aria-selected', isActive);
             });
             
             // Update buttons
             if (jobsPrevBtn) jobsPrevBtn.disabled = clampedIndex === 0;
-            if (jobsNextBtn) jobsNextBtn.disabled = clampedIndex === jobsPages.length - 1;
+            if (jobsNextBtn) jobsNextBtn.disabled = clampedIndex === maxIndex;
         });
         
         if (!skipAnimation) {
@@ -206,8 +248,6 @@
     const WHEEL_THRESHOLD = 50; // Minimum delta to trigger action
 
     function handleWheel(e) {
-        if (!isDesktop) return;
-        
         e.preventDefault();
         e.stopPropagation();
         
@@ -272,11 +312,13 @@
         
         // Jobs section logic
         if (currentSectionIndex === 3) {
+            const maxJobsPage = isMobile ? 11 : 3;
             // Inside jobs
             if (direction > 0) {
                 // Scrolling down
-                if (currentJobsPage < jobsPages.length - 1) {
-                    goToJobsPage(currentJobsPage + 1);
+                if (currentJobsPage < maxJobsPage) {
+                    const nextPage = isMobile ? currentJobsPage + 1 : currentJobsPage + 1;
+                    goToJobsPage(nextPage);
                 } else {
                     // At last page, go to next section
                     goToSection(currentSectionIndex + 1);
@@ -284,7 +326,8 @@
             } else {
                 // Scrolling up
                 if (currentJobsPage > 0) {
-                    goToJobsPage(currentJobsPage - 1);
+                    const prevPage = isMobile ? currentJobsPage - 1 : currentJobsPage - 1;
+                    goToJobsPage(prevPage);
                 } else {
                     // At first page, go to prev section
                     goToSection(currentSectionIndex - 1);
@@ -309,13 +352,15 @@
     function handleKeyboard(e) {
         if (!isDesktop || isAnimating) return;
         
+        const maxJobsPage = isMobile ? 11 : 3;
+        
         switch(e.key) {
             case 'ArrowDown':
             case 'PageDown':
                 e.preventDefault();
                 if (currentSectionIndex === 1 && currentRoadmapStage < roadmapStages.length - 1) {
                     goToRoadmapStage(currentRoadmapStage + 1);
-                } else if (currentSectionIndex === 3 && currentJobsPage < jobsPages.length - 1) {
+                } else if (currentSectionIndex === 3 && currentJobsPage < maxJobsPage) {
                     goToJobsPage(currentJobsPage + 1);
                 } else {
                     goToSection(currentSectionIndex + 1);
@@ -364,31 +409,97 @@
         }
     }
 
-    // ============ TOUCH HANDLER (Mobile fallback) ============
+    // ============ TOUCH HANDLER (Mobile Support) ============
     let touchStartY = 0;
     let touchStartX = 0;
+    let touchStartTime = 0;
 
     function handleTouchStart(e) {
-        if (isDesktop) return;
         touchStartY = e.touches[0].clientY;
         touchStartX = e.touches[0].clientX;
+        touchStartTime = Date.now();
     }
 
     function handleTouchEnd(e) {
-        if (isDesktop) return;
+        if (isAnimating) return;
+        
         const touchEndY = e.changedTouches[0].clientY;
         const touchEndX = e.changedTouches[0].clientX;
+        const touchEndTime = Date.now();
+        
         const diffY = touchStartY - touchEndY;
         const diffX = touchStartX - touchEndX;
+        const timeDiff = touchEndTime - touchStartTime;
         
-        // Horizontal swipe in jobs section
-        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-            const jobsSection = document.querySelector('#jobs');
-            if (jobsSection && isInViewport(jobsSection)) {
-                if (diffX > 0 && currentJobsPage < jobsPages.length - 1) {
-                    goToJobsPage(currentJobsPage + 1, true);
-                } else if (diffX < 0 && currentJobsPage > 0) {
-                    goToJobsPage(currentJobsPage - 1, true);
+        // Ignore if too slow (> 500ms)
+        if (timeDiff > 500) return;
+        
+        // Vertical swipe for sections
+        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > TOUCH_THRESHOLD) {
+            // In roadmap section
+            if (currentSectionIndex === 1) {
+                if (diffY > 0) {
+                    // Swipe up = next
+                    if (currentRoadmapStage < roadmapStages.length - 1) {
+                        goToRoadmapStage(currentRoadmapStage + 1);
+                    } else {
+                        goToSection(currentSectionIndex + 1);
+                    }
+                } else {
+                    // Swipe down = prev
+                    if (currentRoadmapStage > 0) {
+                        goToRoadmapStage(currentRoadmapStage - 1);
+                    } else {
+                        goToSection(currentSectionIndex - 1);
+                    }
+                }
+                return;
+            }
+            
+            // In jobs section
+            if (currentSectionIndex === 3) {
+                const maxJobsPage = isMobile ? 11 : 3;
+                if (diffY > 0) {
+                    // Swipe up = next
+                    if (currentJobsPage < maxJobsPage) {
+                        goToJobsPage(currentJobsPage + 1);
+                    } else {
+                        goToSection(currentSectionIndex + 1);
+                    }
+                } else {
+                    // Swipe down = prev
+                    if (currentJobsPage > 0) {
+                        goToJobsPage(currentJobsPage - 1);
+                    } else {
+                        goToSection(currentSectionIndex - 1);
+                    }
+                }
+                return;
+            }
+            
+            // Regular sections
+            if (diffY > 0) {
+                goToSection(currentSectionIndex + 1);
+            } else {
+                goToSection(currentSectionIndex - 1);
+            }
+        }
+        
+        // Horizontal swipe for roadmap and jobs
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > TOUCH_THRESHOLD) {
+            if (currentSectionIndex === 1) {
+                // Roadmap: swipe left = next, swipe right = prev
+                if (diffX > 0) {
+                    goToRoadmapStage(currentRoadmapStage + 1);
+                } else {
+                    goToRoadmapStage(currentRoadmapStage - 1);
+                }
+            } else if (currentSectionIndex === 3) {
+                // Jobs: swipe left = next, swipe right = prev
+                if (diffX > 0) {
+                    goToJobsPage(currentJobsPage + 1);
+                } else {
+                    goToJobsPage(currentJobsPage - 1);
                 }
             }
         }
@@ -411,52 +522,73 @@
     // ============ JOBS NAVIGATION ============
     if (jobsPrevBtn) {
         jobsPrevBtn.addEventListener('click', () => {
-            if (!isAnimating) goToJobsPage(currentJobsPage - 1);
+            if (!isAnimating) {
+                goToJobsPage(currentJobsPage - 1);
+            }
         });
     }
 
     if (jobsNextBtn) {
         jobsNextBtn.addEventListener('click', () => {
-            if (!isAnimating) goToJobsPage(currentJobsPage + 1);
+            if (!isAnimating) {
+                goToJobsPage(currentJobsPage + 1);
+            }
         });
     }
 
     jobsDots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
-            if (!isAnimating) goToJobsPage(index);
+            if (!isAnimating) {
+                // Desktop: direct page navigation (0, 1, 2, 3)
+                // Mobile: navigate to first job of each group (0, 3, 6, 9)
+                const targetPage = isMobile ? index * 3 : index;
+                goToJobsPage(targetPage);
+            }
         });
     });
+
+    // ============ MOBILE SECTION NAVIGATION ============
+    if (mobileSectionPrevBtn) {
+        mobileSectionPrevBtn.addEventListener('click', () => {
+            if (!isAnimating && isMobile) {
+                goToSection(currentSectionIndex - 1);
+            }
+        });
+    }
+
+    if (mobileSectionNextBtn) {
+        mobileSectionNextBtn.addEventListener('click', () => {
+            if (!isAnimating && isMobile) {
+                goToSection(currentSectionIndex + 1);
+            }
+        });
+    }
 
     // ============ RESIZE HANDLER ============
     function handleResize() {
         const wasDesktop = isDesktop;
+        const wasMobile = isMobile;
+        
         isDesktop = window.innerWidth > MOBILE_BREAKPOINT;
+        isMobile = window.innerWidth <= 900;
+        
+        // Reset jobs page if switching between mobile/desktop
+        if (wasMobile !== isMobile) {
+            currentJobsPage = 0;
+            goToJobsPage(0, true);
+        }
         
         // Update viewport height
         viewportHeight = window.innerHeight;
         
-        if (wasDesktop !== isDesktop) {
-            if (isDesktop) {
-                // Switch to desktop mode
-                body.style.overflow = 'hidden';
-                goToSection(0, true);
-                goToRoadmapStage(0, true);
-                goToJobsPage(0, true);
-            } else {
-                // Switch to mobile mode
-                body.style.overflow = '';
-                slidesWrapper.style.transform = '';
-                roadmapTrack.style.transform = '';
-                jobsTrack.style.transform = '';
-                roadmapStages.forEach(stage => stage.classList.add('is-active'));
-            }
-        } else if (isDesktop) {
-            // Recalculate position on resize in desktop mode
-            requestAnimationFrame(() => {
-                const translateY = -currentSectionIndex * viewportHeight;
-                slidesWrapper.style.transform = `translate3d(0, ${translateY}px, 0)`;
-            });
-        }
+        // Always recalculate position on resize
+        requestAnimationFrame(() => {
+            const translateY = -currentSectionIndex * viewportHeight;
+            slidesWrapper.style.transform = `translate3d(0, ${translateY}px, 0)`;
+        });
+        
+        // Update mobile section buttons
+        updateMobileSectionButtons();
     }
 
     // ============ INITIALIZATION ============
@@ -477,23 +609,17 @@
             }, 500);
         }
 
-        // Initialize based on screen size
-        if (isDesktop) {
-            body.style.overflow = 'hidden';
-            goToSection(0, true);
-            goToRoadmapStage(0, true);
-            goToJobsPage(0, true);
-            
-            // Add event listeners for desktop
-            window.addEventListener('wheel', handleWheel, { passive: false });
-            window.addEventListener('keydown', handleKeyboard);
-        } else {
-            // Mobile: show all stages as active
-            roadmapStages.forEach(stage => stage.classList.add('is-active'));
-            jobsTrack.style.transform = '';
-        }
+        // Initialize - always use slide mode
+        body.style.overflow = 'hidden';
+        goToSection(0, true);
+        goToRoadmapStage(0, true);
+        goToJobsPage(0, true);
+        
+        // Add event listeners
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('keydown', handleKeyboard);
 
-        // Touch events (for mobile swipe)
+        // Touch events for mobile
         window.addEventListener('touchstart', handleTouchStart, { passive: true });
         window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
@@ -501,11 +627,9 @@
         window.addEventListener('resize', handleResize);
 
         // Apply will-change for performance
-        if (isDesktop) {
-            slidesWrapper.style.willChange = 'transform';
-            roadmapTrack.style.willChange = 'transform';
-            jobsTrack.style.willChange = 'transform';
-        }
+        slidesWrapper.style.willChange = 'transform';
+        roadmapTrack.style.willChange = 'transform';
+        jobsTrack.style.willChange = 'transform';
     }
 
     // ============ START ============
