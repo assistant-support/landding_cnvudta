@@ -121,6 +121,7 @@ body.is-animating {
     white-space: nowrap;
     border-right: .15em solid var(--accent-color);
     animation: typing 3.5s steps(32, end), blink-caret .75s step-end infinite;
+    max-width: 100%;
 }
 
 @keyframes typing {
@@ -459,7 +460,8 @@ body.is-animating {
     position: relative;
     width: 100%;
     max-width: 1200px;
-    overflow: hidden; /* Hide overflowing content */
+    overflow: hidden;
+    /* Hide overflowing content */
     flex: 1;
     display: flex;
     align-items: center;
@@ -477,8 +479,10 @@ body.is-animating {
     display: grid;
     width: 100%;
     flex-shrink: 0;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns in 1 row */
-    grid-template-rows: 1fr; /* Single row */
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 columns in 1 row */
+    grid-template-rows: 1fr;
+    /* Single row */
     gap: 30px;
     padding: 0 60px;
     align-items: stretch;
@@ -504,7 +508,8 @@ body.is-animating {
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-width: 0; /* Allow cards to shrink */
+    min-width: 0;
+    /* Allow cards to shrink */
 }
 
 .job-card:hover {
@@ -964,6 +969,7 @@ body.is-animating {
     display: flex;
     gap: 15px;
     z-index: 100;
+    opacity: 0;
 }
 
 .nav-dot {
@@ -1197,6 +1203,12 @@ body.is-animating {
 
 /* RESPONSIVE - MOBILE */
 @media (max-width: 900px) {
+
+    /* Enable smooth scrolling for mobile */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+
     .hero-content {
         width: 100%;
     }
@@ -1209,6 +1221,8 @@ body.is-animating {
     body {
         overflow: hidden;
         position: fixed;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
     /* Header more compact */
@@ -1324,7 +1338,10 @@ body.is-animating {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 60px 15px 60px 15px;
+        padding: 10vh 15px 15vh 15px;
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
     }
 
     #clubs .section-title {
@@ -1334,17 +1351,18 @@ body.is-animating {
     .clubs-grid {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 2vh;
         overflow-y: auto;
         overflow-x: hidden;
-        flex: 1;
-        padding-bottom: 20px;
-        align-items: center;
         width: 100%;
-        max-height: calc(100vh - 120px);
-        justify-content: center;
+        max-width: 400px;
+        height: 100%;
+        max-height: 80vh;
+        align-items: stretch;
+        justify-content: flex-start;
         scrollbar-width: thin;
         scrollbar-color: rgba(37, 99, 235, 0.3) transparent;
+        padding: 0;
     }
 
     .clubs-grid::-webkit-scrollbar {
@@ -1362,34 +1380,46 @@ body.is-animating {
 
     .club-card {
         width: 100%;
-        max-width: 380px;
+        max-width: 100%;
         padding: 15px;
         min-height: auto;
+        max-height: 25vh;
         flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .club-logo {
-        width: 60px;
-        height: 60px;
-        margin-bottom: 10px;
+        width: 50px;
+        height: 50px;
+        margin-bottom: 8px;
+        flex-shrink: 0;
     }
 
     .club-card h3 {
-        font-size: 1rem;
-        margin-bottom: 8px;
+        font-size: 0.95rem;
+        margin-bottom: 6px;
         min-height: auto;
         line-height: 1.2;
+        flex-shrink: 0;
     }
 
     .club-card p {
-        font-size: 0.8rem;
-        margin-bottom: 12px;
-        line-height: 1.4;
+        font-size: 0.75rem;
+        margin-bottom: 10px;
+        line-height: 1.3;
+        flex-grow: 1;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
     }
 
     .club-card .cta-button {
-        padding: 8px 20px;
-        font-size: 0.85rem;
+        padding: 6px 16px;
+        font-size: 0.75rem;
+        flex-shrink: 0;
     }
 
     /* Jobs section mobile - 1 job per page */
@@ -1440,7 +1470,7 @@ body.is-animating {
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5);
     }
-    
+
     .mobile-section-btn:hover {
         background: rgba(37, 99, 235, 1);
         transform: scale(1.05);
@@ -1484,7 +1514,6 @@ body.is-animating {
         flex-shrink: 0;
         flex-direction: column;
         gap: 0;
-        padding: 20px;
         align-items: center;
         justify-content: center;
         overflow: visible;
@@ -1513,8 +1542,8 @@ body.is-animating {
         overflow: hidden;
         margin: 0;
     }
-    
-    .jobs-page.mobile-page .job-card > img {
+
+    .jobs-page.mobile-page .job-card>img {
         width: 100%;
         max-width: 100%;
         height: auto;
@@ -1547,7 +1576,8 @@ body.is-animating {
         margin-top: 20px;
         gap: 10px;
         flex-shrink: 0;
-        padding-bottom: 70px; /* Space for mobile section nav buttons */
+        padding-bottom: 0px !important;
+        /* Space for mobile section nav buttons */
     }
 
     .jobs-dot {
@@ -1574,18 +1604,59 @@ body.is-animating {
     }
 }
 
-/* Extra small devices */
+/* Extra small devices - 480px and below */
 @media (max-width: 480px) {
+    .main-header .logo img {
+        height: 45px;
+    }
+
     .main-title {
         font-size: 1.6rem;
+        line-height: 1.3;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+        margin-top: 10px;
     }
 
     .stage-image-wrapper {
-        max-height: 30vh;
+        max-height: 28vh;
+        margin-bottom: 15px;
+    }
+
+    .stage-year {
+        font-size: 1rem;
+    }
+
+    .stage-goal {
+        font-size: 0.8rem;
+    }
+
+    .milestones li {
+        margin-bottom: 10px;
+        font-size: 0.85rem;
+    }
+
+    .milestones li span {
+        font-size: 1.1rem;
+        margin-right: 10px;
+    }
+
+    .challenge {
+        padding: 12px;
+    }
+
+    .challenge h4 {
+        font-size: 0.85rem;
+    }
+
+    .challenge p {
+        font-size: 0.8rem;
     }
 
     .jobs-page {
-        padding: 0 40px;
+        padding: 0 30px;
     }
 
     .jobs-nav-btn {
@@ -1596,5 +1667,524 @@ body.is-animating {
     .club-card,
     .job-card {
         max-width: 100%;
+    }
+
+    .clubs-grid {
+        gap: 1.1vh;
+        max-height: 78vh;
+    }
+
+    .club-card {
+        padding: 12px;
+        max-height: 24vh;
+    }
+
+    .club-logo {
+        width: 55px;
+        height: 55px;
+    }
+
+    .club-card h3 {
+        font-size: 0.95rem;
+    }
+
+    .club-card p {
+        font-size: 0.75rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .club-card .cta-button {
+        padding: 7px 18px;
+        font-size: 0.8rem;
+    }
+
+    .job-card h3 {
+        font-size: 1rem;
+        padding: 12px 12px 8px 12px;
+    }
+
+    .job-card p {
+        font-size: 0.8rem;
+        padding: 0 12px 12px 12px;
+    }
+
+    .destination-content h2 {
+        font-size: 1.6rem;
+    }
+
+    .destination-content p {
+        font-size: 0.85rem;
+    }
+
+    .mobile-section-btn {
+        width: 45px;
+        height: 45px;
+    }
+
+    .jobs-pagination {
+        padding-bottom: 65px;
+    }
+}
+
+/* Small mobile devices - 540px and below */
+@media (max-width: 540px) {
+    .main-header .logo img {
+        height: 48px;
+    }
+
+    .main-title {
+        font-size: 1.7rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .stage-image-wrapper {
+        max-height: 30vh;
+    }
+
+    .stage-year {
+        font-size: 1.05rem;
+    }
+
+    .stage-goal {
+        font-size: 0.85rem;
+    }
+
+    .milestones li {
+        font-size: 0.88rem;
+    }
+
+    .clubs-grid {
+        gap: 1.4vh;
+        max-height: 80vh;
+    }
+
+    .club-card {
+        padding: 13px;
+        max-height: 25vh;
+    }
+
+    .club-logo {
+        width: 58px;
+        height: 58px;
+    }
+
+    .club-card h3 {
+        font-size: 0.98rem;
+    }
+
+    .club-card p {
+        font-size: 0.78rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .job-card h3 {
+        font-size: 1.05rem;
+    }
+
+    .job-card p {
+        font-size: 0.83rem;
+    }
+
+    .destination-content h2 {
+        font-size: 1.7rem;
+    }
+
+    .destination-content p {
+        font-size: 0.88rem;
+    }
+}
+
+/* Very small devices - 420px and below */
+@media (max-width: 420px) {
+    .main-header {
+        padding: 8px 15px;
+    }
+
+    .main-header .logo img {
+        height: 42px;
+    }
+
+    #hero {
+        padding: 0 12px;
+    }
+
+    .main-title {
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+    }
+
+    .roadmap-stage {
+        padding: 70px 15px 35px 15px;
+    }
+
+    .stage-image-wrapper {
+        width: 95%;
+        max-height: 25vh;
+    }
+
+    .stage-year {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .stage-goal {
+        font-size: 0.75rem;
+        margin-bottom: 12px;
+    }
+
+    .milestones li {
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+    }
+
+    .milestones li span {
+        font-size: 1rem;
+        margin-right: 8px;
+    }
+
+    .challenge {
+        padding: 10px;
+        margin-top: 12px;
+    }
+
+    .challenge h4 {
+        font-size: 0.8rem;
+    }
+
+    .challenge p {
+        font-size: 0.75rem;
+    }
+
+    #clubs {
+        padding: 55px 12px 55px 12px;
+    }
+
+    .clubs-grid {
+        gap: 1vh;
+        max-height: 78vh;
+        padding: 0 !important;
+    }
+
+    .club-card {
+        padding: 10px;
+        max-width: 350px;
+        max-height: 24vh;
+    }
+
+    .club-logo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .club-card h3 {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+
+    .club-card p {
+        font-size: 0.72rem;
+        margin-bottom: 8px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .club-card .cta-button {
+        padding: 6px 16px;
+        font-size: 0.75rem;
+    }
+
+    #jobs {
+        padding: 70px 12px 90px 12px;
+    }
+
+    #jobs .section-title h2 {
+        font-size: 1.2rem;
+    }
+
+    #jobs .section-title p {
+        font-size: 0.75rem;
+        padding: 0 5px;
+    }
+
+    .jobs-page.mobile-page .job-card {
+        max-width: 350px;
+    }
+
+    .job-card h3 {
+        font-size: 0.95rem;
+        padding: 10px 10px 8px 10px;
+    }
+
+    .job-card p {
+        font-size: 0.75rem;
+        padding: 0 10px 10px 10px;
+    }
+
+    .destination-content h2 {
+        font-size: 1.4rem;
+    }
+
+    .destination-content p {
+        font-size: 0.8rem;
+    }
+
+    .cta-button {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+    }
+
+    .mobile-section-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 1.2rem;
+    }
+
+    .mobile-section-nav {
+        bottom: 20px;
+        right: 15px;
+        gap: 10px;
+    }
+
+    .jobs-pagination {
+        padding-bottom: 60px;
+        gap: 8px;
+    }
+
+    .jobs-dot {
+        width: 7px;
+        height: 7px;
+    }
+
+    .nav-dot {
+        width: 9px;
+        height: 9px;
+    }
+
+    .roadmap-nav {
+        bottom: 12px;
+        gap: 10px;
+    }
+}
+
+/* Ultra small devices - 375px and below (iPhone SE, small phones) */
+@media (max-width: 375px) {
+    .clubs-grid {
+        gap: 1vh !important;
+        max-height: 80vh;
+        padding: 0 !important;
+    }
+
+    .cta-button,
+    .nav-dot {
+        min-width: 44px;
+        min-height: 32px;
+    }
+
+    .main-header {
+        padding: 6px 12px;
+    }
+
+    .main-header .logo img {
+        height: 38px;
+    }
+
+    #hero {
+        padding: 0 10px;
+    }
+
+    .main-title {
+        font-size: 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .main-title span {
+        word-break: break-word;
+    }
+
+    .subtitle {
+        font-size: 0.75rem;
+    }
+
+    .scroll-down-indicator {
+        bottom: 20px;
+    }
+
+    .roadmap-stage {
+        padding: 65px 12px 30px 12px;
+    }
+
+    .stage-image-wrapper {
+        width: 98%;
+        max-height: 22vh;
+        margin-bottom: 12px;
+    }
+
+    .stage-year {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        word-break: break-word;
+    }
+
+    .stage-goal {
+        font-size: 0.7rem;
+        margin-bottom: 10px;
+    }
+
+    .milestones {
+        margin-bottom: 15px;
+    }
+
+    .milestones li {
+        margin-bottom: 7px;
+        font-size: 0.75rem;
+    }
+
+    .milestones li span {
+        font-size: 0.95rem;
+        margin-right: 7px;
+        flex-shrink: 0;
+    }
+
+    .milestones li div {
+        word-break: break-word;
+    }
+
+    .challenge {
+        padding: 8px;
+        margin-top: 10px;
+    }
+
+    .challenge h4 {
+        font-size: 0.75rem;
+        margin-bottom: 3px;
+    }
+
+    .challenge p {
+        font-size: 0.7rem;
+    }
+
+    #clubs {
+        padding: 50px 10px 50px 10px;
+    }
+
+    .club-card {
+        padding: 8px;
+        max-width: 320px;
+    }
+
+    .club-logo {
+        width: 45px;
+        height: 45px;
+        margin-bottom: 6px;
+    }
+
+    .club-card h3 {
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+    }
+
+    .club-card p {
+        font-size: 0.68rem;
+        margin-bottom: 8px;
+        line-height: 1.25;
+        -webkit-line-clamp: 2;
+    }
+
+    .club-card .cta-button {
+        padding: 5px 12px;
+        font-size: 0.68rem;
+    }
+
+    #jobs {
+        padding: 65px 10px 85px 10px;
+    }
+
+    #jobs .section-title {
+        margin-bottom: 15px;
+    }
+
+    #jobs .section-title h2 {
+        font-size: 1.1rem;
+    }
+
+    #jobs .section-title p {
+        font-size: 0.7rem;
+    }
+
+    .jobs-page.mobile-page .job-card {
+        max-width: 320px;
+    }
+
+    .job-card h3 {
+        font-size: 0.9rem;
+        padding: 8px 8px 6px 8px;
+        word-break: break-word;
+    }
+
+    .job-card p {
+        font-size: 0.7rem;
+        padding: 0 8px 8px 8px;
+        line-height: 1.4;
+    }
+
+    .destination-content h2 {
+        font-size: 1.3rem;
+        word-break: break-word;
+    }
+
+    .destination-content p {
+        font-size: 0.75rem;
+    }
+
+    .cta-button {
+        padding: 10px 18px;
+        font-size: 0.8rem;
+    }
+
+    .mobile-section-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+
+    .mobile-section-nav {
+        bottom: 18px;
+        right: 12px;
+        gap: 8px;
+    }
+
+    .jobs-pagination {
+        padding-bottom: 65px;
+        gap: 10px;
+    }
+
+    .jobs-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .nav-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .roadmap-nav {
+        bottom: 10px;
+        gap: 10px;
     }
 }
