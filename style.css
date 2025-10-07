@@ -784,7 +784,7 @@ body.is-animating {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 0 5vw;
+    padding: 16px 5vw;
     z-index: 1000;
     background: rgba(0, 0, 0, 0);
     backdrop-filter: blur(10px);
@@ -800,7 +800,7 @@ body.is-animating {
 }
 
 .main-header .logo img {
-    height: 80px;
+    height: 70px;
     width: auto;
 }
 
