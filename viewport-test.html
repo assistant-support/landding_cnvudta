@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Viewport Test Utility</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 20px;
+            background: #0A192F;
+            color: white;
+        }
+        .test-panel {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1 { font-size: 1.5rem; margin-bottom: 10px; }
+        h2 { font-size: 1.2rem; margin: 15px 0 10px; }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .metric-label { font-weight: 500; }
+        .metric-value { 
+            font-family: monospace; 
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        button {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:active {
+            background: #1d4ed8;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .status.good { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .status.warning { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .status.error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h1>🔬 Viewport Height Test Utility</h1>
+        <p>Test viewport values for mobile debugging</p>
+    </div>
+
+    <div class="test-panel">
+        <h2>📏 Current Measurements</h2>
+        <div id="metrics"></div>
+        <button onclick="updateMetrics()">🔄 Refresh Measurements</button>
+    </div>
+
+    <div class="test-panel">
+        <h2>✅ Compatibility Check</h2>
+        <div id="compat"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>📱 Device Info</h2>
+        <div id="device-info"></div>
+    </div>
+
+    <div class="test-panel">
+        <h2>🧪 Quick Tests</h2>
+        <button onclick="testScrollBehavior()">Test Scroll Behavior</button>
+        <button onclick="copyDebugInfo()">📋 Copy Debug Info</button>
+        <div id="test-result"></div>
+    </div>
+
+    <script>
+        function updateMetrics() {
+            const metrics = {
+                'window.innerHeight': window.innerHeight,
+                'window.outerHeight': window.outerHeight,
+                'window.visualViewport.height': window.visualViewport?.height || 'N/A',
+                'screen.height': screen.height,
+                'screen.availHeight': screen.availHeight,
+                '--vh variable': getComputedStyle(document.documentElement).getPropertyValue('--vh'),
+                'calc(var(--vh) * 100)': `${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh')) * 100}px`,
+                '100dvh (measured)': measureDvh(),
+                '100vh (measured)': measureVh()
+            };
+
+            const html = Object.entries(metrics).map(([label, value]) => `
+                <div class="metric">
+                    <span class="metric-label">${label}</span>
+                    <span class="metric-value">${value}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('metrics').innerHTML = html;
+        }
+
+        function measureDvh() {
+            const el = document.createElement('div');
+            el.style.cssText = 'position:fixed;left:-9999px;top:-9999px;height:100dvh;width:1px;';
+            document.body.appendChild(el);
+            const h = el.getBoundingClientRect().height;
+            el.remove();
+            return h ? `${h}px` : 'Not supported';
+        }
+
+        function measureVh() {
+            const el = document.createElement('div');
+            el.style.cssText = 'position:fixed;left:-9999px;top:-9999px;height:100vh;width:1px;';
+            document.body.appendChild(el);
+            const h = el.getBoundingClientRect().height;
+            el.remove();
+            return `${h}px`;
+        }
+
+        function checkCompatibility() {
+            const checks = {
+                'dvh support': CSS.supports('height', '100dvh'),
+                'visualViewport API': !!window.visualViewport,
+                '-webkit-fill-available': CSS.supports('height', '-webkit-fill-available'),
+                'env() support': CSS.supports('padding', 'env(safe-area-inset-bottom)'),
+                '--vh variable set': !!getComputedStyle(document.documentElement).getPropertyValue('--vh')
+            };
+
+            const html = Object.entries(checks).map(([label, supported]) => {
+                const status = supported ? 'good' : 'warning';
+                const icon = supported ? '✅' : '⚠️';
+                return `
+                    <div class="status ${status}">
+                        ${icon} ${label}: ${supported ? 'Yes' : 'No'}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('compat').innerHTML = html;
+        }
+
+        function getDeviceInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Platform': navigator.platform,
+                'Screen Size': `${screen.width} × ${screen.height}`,
+                'Window Size': `${window.innerWidth} × ${window.innerHeight}`,
+                'Device Pixel Ratio': window.devicePixelRatio,
+                'Orientation': screen.orientation?.type || 'N/A',
+                'Touch Support': 'ontouchstart' in window ? 'Yes' : 'No',
+                'Standalone Mode': window.matchMedia('(display-mode: standalone)').matches ? 'Yes (PWA)' : 'No'
+            };
+
+            const html = Object.entries(info).map(([label, value]) => `
+                <div class="metric">
+                    <span class="metric-label">${label}</span>
+                    <span class="metric-value">${value}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('device-info').innerHTML = html;
+        }
+
+        function testScrollBehavior() {
+            const result = document.getElementById('test-result');
+            result.innerHTML = '<div class="status good">Scroll up and down this page. Watch the measurements above change as the URL bar shows/hides.</div>';
+            
+            let scrollCount = 0;
+            const scrollHandler = () => {
+                scrollCount++;
+                if (scrollCount === 1) {
+                    result.innerHTML = '<div class="status good">✅ Scroll detected! Keep scrolling to test URL bar behavior.</div>';
+                }
+            };
+            
+            window.addEventListener('scroll', scrollHandler, { passive: true, once: false });
+            setTimeout(() => {
+                window.removeEventListener('scroll', scrollHandler);
+            }, 10000);
+        }
+
+        function copyDebugInfo() {
+            const debugInfo = {
+                innerHeight: window.innerHeight,
+                visualViewport: window.visualViewport?.height,
+                dvh: measureDvh(),
+                vh: measureVh(),
+                vhVariable: getComputedStyle(document.documentElement).getPropertyValue('--vh'),
+                userAgent: navigator.userAgent,
+                screenSize: `${screen.width}×${screen.height}`,
+                timestamp: new Date().toISOString()
+            };
+
+            const text = JSON.stringify(debugInfo, null, 2);
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const result = document.getElementById('test-result');
+                    result.innerHTML = '<div class="status good">✅ Debug info copied to clipboard!</div>';
+                });
+            } else {
+                const result = document.getElementById('test-result');
+                result.innerHTML = `<div class="status warning">
+                    <pre style="overflow-x:auto;font-size:0.8rem;">${text}</pre>
+                </div>`;
+            }
+        }
+
+        // Initialize
+        updateMetrics();
+        checkCompatibility();
+        getDeviceInfo();
+
+        // Auto-update on resize/orientation change
+        window.addEventListener('resize', updateMetrics, { passive: true });
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateMetrics, 100);
+        }, { passive: true });
+        
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateMetrics, { passive: true });
+        }
+
+        // Add some content to make page scrollable
+        const spacer = document.createElement('div');
+        spacer.style.height = '200vh';
+        spacer.innerHTML = '<div class="test-panel"><h2>⬆️ Scroll back up</h2><p>Scroll to test viewport changes</p></div>';
+        document.body.appendChild(spacer);
+    </script>
+</body>
+</html>

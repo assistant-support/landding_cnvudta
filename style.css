@@ -10,6 +10,62 @@
     --anim-easing: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
+/* ===== Base reset tối thiểu ===== */
+html, body { height: 100%; }
+body { margin: 0; box-sizing: border-box; -webkit-text-size-adjust: 100%; }
+*, *::before, *::after { box-sizing: inherit; }
+
+/* ===== Chiến lược chiều cao an toàn (theo thứ tự ưu tiên) ===== */
+/* 0) Fallback cũ */
+.app, .screen { min-height: 100vh; }
+
+/* 1) WebKit đời cũ (trước khi có dvh) */
+@supports (-webkit-touch-callout: none) {
+  .app, .screen { min-height: -webkit-fill-available; }
+}
+
+/* 2) Fallback khi chưa có dvh: dùng biến --vh tính bằng JS */
+@supports not (min-height: 100dvh) {
+  .app, .screen { min-height: calc(var(--vh, 1vh) * 100); }
+}
+
+/* 3) Trình duyệt hiện đại: dvh theo visual viewport động */
+@supports (min-height: 100dvh) {
+  .app, .screen { min-height: 100dvh; }
+}
+
+/* ===== Layout ổn định ===== */
+.app { 
+  display: flex; 
+  flex-direction: column;
+  /* Safe areas (tai thỏ, gesture bar) */
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left:   env(safe-area-inset-left);
+  padding-right:  env(safe-area-inset-right);
+}
+.main { flex: 1 1 auto; }
+
+/* Nếu đang dùng header/footer dính mép, ưu tiên sticky thay vì fixed */
+.header { position: sticky; top: 0; }
+.footer { position: sticky; bottom: 0; }
+
+/* Modal toàn màn (nếu có) – tránh 100vh cứng */
+.modal,
+.modal__backdrop {
+  min-height: 100vh;
+}
+@supports (min-height: 100dvh) {
+  .modal,
+  .modal__backdrop { min-height: 100dvh; }
+}
+.modal__content {
+  max-height: 100%;
+  overflow: auto;
+}
+
+/* Tránh overflow ẩn toàn cục (chỉ áp khi thực sự cần) */
+html, body { overflow-x: hidden; }
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -19,7 +75,6 @@
 html {
     overflow: hidden;
     height: 100%;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100%;
 }
 
@@ -29,12 +84,11 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     overflow: hidden;
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     margin: 0;
     padding: 0;
     position: fixed;
+    height: 100%;
 }
 
 body.is-animating {
@@ -45,8 +99,6 @@ body.is-animating {
 /* SLIDES WRAPPER - CHUYỂN SECTION */
 .slides-wrapper {
     width: 100vw;
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     position: fixed;
     top: 0;
     left: 0;
@@ -54,18 +106,30 @@ body.is-animating {
     transition: transform var(--anim-duration) var(--anim-easing);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+}
+@supports (height: 100dvh) {
+    .slides-wrapper {
+        height: 100dvh;
+    }
 }
 
 .slide {
     width: 100vw;
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    max-height: 100vh;
-    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     position: relative;
     overflow: hidden;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+}
+@supports (height: 100dvh) {
+    .slide {
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+    }
 }
 
 /* HEADER & LOGO */
@@ -191,15 +255,20 @@ body.is-animating {
 
 .roadmap-track {
     width: 400vw;
-    height: 100vh;
     display: flex;
     will-change: transform;
     transition: transform var(--anim-duration) var(--anim-easing);
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+}
+@supports (height: 100dvh) {
+    .roadmap-track {
+        height: 100dvh;
+    }
 }
 
 .roadmap-stage {
     width: 100vw;
-    height: 100vh;
     flex-shrink: 0;
     display: flex;
     justify-content: center;
@@ -207,6 +276,13 @@ body.is-animating {
     padding: 5vw;
     gap: 5vw;
     overflow: hidden;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+}
+@supports (height: 100dvh) {
+    .roadmap-stage {
+        height: 100dvh;
+    }
 }
 
 .roadmap-stage:nth-child(even) {
@@ -643,7 +719,6 @@ body.is-animating {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
     background-color: var(--bg-dark);
     display: flex;
     flex-direction: column;
@@ -651,6 +726,13 @@ body.is-animating {
     align-items: center;
     z-index: 9999;
     transition: opacity 0.5s ease, visibility 0.5s ease;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+}
+@supports (height: 100dvh) {
+    .loading-screen {
+        height: 100dvh;
+    }
 }
 
 .loading-screen.hidden {
@@ -725,12 +807,6 @@ body.is-animating {
 /* HERO & DESTINATION */
 #hero,
 #destination {
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    max-height: 100vh;
-    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     display: flex;
     flex-direction: column;
@@ -741,6 +817,18 @@ body.is-animating {
     scroll-snap-align: start;
     scroll-snap-stop: always;
     overflow: hidden;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+}
+@supports (height: 100dvh) {
+    #hero,
+    #destination {
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+    }
 }
 
 #hero {
@@ -838,7 +926,6 @@ body.is-animating {
 }
 
 .roadmap-track {
-    height: 100vh;
     width: 400vw;
     display: flex;
     position: sticky;
@@ -847,12 +934,17 @@ body.is-animating {
     transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
     scroll-snap-align: start;
     scroll-snap-stop: always;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+}
+@supports (height: 100dvh) {
+    .roadmap-track {
+        height: 100dvh;
+    }
 }
 
 .roadmap-stage {
     width: 100vw;
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     flex-shrink: 0;
     display: flex;
     justify-content: center;
@@ -864,6 +956,13 @@ body.is-animating {
     overflow: hidden;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+}
+@supports (height: 100dvh) {
+    .roadmap-stage {
+        height: 100dvh;
+    }
 }
 
 .roadmap-stage:nth-child(even) {
@@ -1001,12 +1100,6 @@ body.is-animating {
 
 /* CÂU LẠC BỘ */
 #clubs {
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    max-height: 100vh;
-    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     padding: 80px 5vw 60px 5vw;
     background-color: var(--bg-dark);
@@ -1014,6 +1107,17 @@ body.is-animating {
     scroll-snap-stop: always;
     overflow: hidden;
     position: relative;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+}
+@supports (height: 100dvh) {
+    #clubs {
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+    }
 }
 
 #clubs .section-title {
@@ -1119,12 +1223,6 @@ body.is-animating {
 
 /* CƠ HỘI NGHỀ NGHIỆP */
 #jobs {
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
-    max-height: 100vh;
-    max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     width: 100vw;
     padding: 80px 5vw 60px 5vw;
     display: flex;
@@ -1134,6 +1232,17 @@ body.is-animating {
     scroll-snap-stop: always;
     overflow: hidden;
     position: relative;
+    /* Dynamic viewport height - Fallback + Modern */
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+}
+@supports (height: 100dvh) {
+    #jobs {
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+    }
 }
 
 #jobs .section-title {
@@ -1258,6 +1367,8 @@ body.is-animating {
     .main-title {
         font-size: clamp(1.8rem, 8vw, 2.5rem);
         line-height: 1.5;
+        width: max-content !important;
+        margin: auto;
     }
 
     .subtitle {
@@ -1295,7 +1406,8 @@ body.is-animating {
         max-width: 400px;
         height: auto;
         max-height: 35vh;
-        max-height: 35dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 35dvh;
+        /* Dynamic viewport height for mobile browsers */
         margin-bottom: 20px;
         flex-shrink: 0;
     }
@@ -1356,11 +1468,14 @@ body.is-animating {
         justify-content: center;
         align-items: center;
         padding: 10vh 15px 15vh 15px;
-        padding: 10dvh 15px 15dvh 15px; /* Dynamic viewport height for mobile browsers */
+        padding: 10dvh 15px 15dvh 15px;
+        /* Dynamic viewport height for mobile browsers */
         height: 100vh;
-        height: 100dvh; /* Dynamic viewport height for mobile browsers */
+        height: 100dvh;
+        /* Dynamic viewport height for mobile browsers */
         max-height: 100vh;
-        max-height: 100dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 100dvh;
+        /* Dynamic viewport height for mobile browsers */
         overflow: hidden;
     }
 
@@ -1372,14 +1487,16 @@ body.is-animating {
         display: flex;
         flex-direction: column;
         gap: 2vh;
-        gap: 2dvh; /* Dynamic viewport height for mobile browsers */
+        gap: 2dvh;
+        /* Dynamic viewport height for mobile browsers */
         overflow-y: auto;
         overflow-x: hidden;
         width: 100%;
         max-width: 400px;
         height: 100%;
         max-height: 80vh;
-        max-height: 80dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 80dvh;
+        /* Dynamic viewport height for mobile browsers */
         align-items: stretch;
         justify-content: flex-start;
         scrollbar-width: thin;
@@ -1406,7 +1523,8 @@ body.is-animating {
         padding: 15px;
         min-height: auto;
         max-height: 25vh;
-        max-height: 25dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 25dvh;
+        /* Dynamic viewport height for mobile browsers */
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
@@ -1645,7 +1763,8 @@ body.is-animating {
 
     .stage-image-wrapper {
         max-height: 28vh;
-        max-height: 28dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 28dvh;
+        /* Dynamic viewport height for mobile browsers */
         margin-bottom: 15px;
     }
 
@@ -1695,15 +1814,18 @@ body.is-animating {
 
     .clubs-grid {
         gap: 1.1vh;
-        gap: 1.1dvh; /* Dynamic viewport height for mobile browsers */
+        gap: 1.1dvh;
+        /* Dynamic viewport height for mobile browsers */
         max-height: 78vh;
-        max-height: 78dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 78dvh;
+        /* Dynamic viewport height for mobile browsers */
     }
 
     .club-card {
         padding: 12px;
         max-height: 24vh;
-        max-height: 24dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 24dvh;
+        /* Dynamic viewport height for mobile browsers */
     }
 
     .club-logo {
@@ -1763,7 +1885,7 @@ body.is-animating {
     }
 
     .main-title {
-        font-size: 1.7rem;
+        font-size: 1.3rem;
     }
 
     .subtitle {
@@ -1772,7 +1894,8 @@ body.is-animating {
 
     .stage-image-wrapper {
         max-height: 30vh;
-        max-height: 30dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 30dvh;
+        /* Dynamic viewport height for mobile browsers */
     }
 
     .stage-year {
@@ -1789,15 +1912,18 @@ body.is-animating {
 
     .clubs-grid {
         gap: 1.4vh;
-        gap: 1.4dvh; /* Dynamic viewport height for mobile browsers */
+        gap: 1.4dvh;
+        /* Dynamic viewport height for mobile browsers */
         max-height: 80vh;
-        max-height: 80dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 80dvh;
+        /* Dynamic viewport height for mobile browsers */
     }
 
     .club-card {
         padding: 13px;
         max-height: 25vh;
-        max-height: 25dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 25dvh;
+        /* Dynamic viewport height for mobile browsers */
     }
 
     .club-logo {
@@ -1849,7 +1975,7 @@ body.is-animating {
     }
 
     .main-title {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
         margin-bottom: 0.8rem;
     }
 
@@ -1864,7 +1990,8 @@ body.is-animating {
     .stage-image-wrapper {
         width: 95%;
         max-height: 25vh;
-        max-height: 25dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 25dvh;
+        /* Dynamic viewport height for mobile browsers */
     }
 
     .stage-year {
@@ -1906,9 +2033,11 @@ body.is-animating {
 
     .clubs-grid {
         gap: 1vh;
-        gap: 1dvh; /* Dynamic viewport height for mobile browsers */
+        gap: 1dvh;
+        /* Dynamic viewport height for mobile browsers */
         max-height: 78vh;
-        max-height: 78dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 78dvh;
+        /* Dynamic viewport height for mobile browsers */
         padding: 0 !important;
     }
 
@@ -1916,7 +2045,8 @@ body.is-animating {
         padding: 10px;
         max-width: 350px;
         max-height: 24vh;
-        max-height: 24dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 24dvh;
+        /* Dynamic viewport height for mobile browsers */
     }
 
     .club-logo {
@@ -2020,9 +2150,11 @@ body.is-animating {
 @media (max-width: 376px) {
     .clubs-grid {
         gap: 1vh !important;
-        gap: 1dvh !important; /* Dynamic viewport height for mobile browsers */
+        gap: 1dvh !important;
+        /* Dynamic viewport height for mobile browsers */
         max-height: 80vh;
-        max-height: 80dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 80dvh;
+        /* Dynamic viewport height for mobile browsers */
         padding: 0 !important;
     }
 
@@ -2068,7 +2200,8 @@ body.is-animating {
     .stage-image-wrapper {
         width: 98%;
         max-height: 22vh;
-        max-height: 22dvh; /* Dynamic viewport height for mobile browsers */
+        max-height: 22dvh;
+        /* Dynamic viewport height for mobile browsers */
         margin-bottom: 12px;
     }
 

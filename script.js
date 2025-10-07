@@ -3,6 +3,24 @@
 // Hệ thống điều khiển chuyển cảnh toàn màn hình
 // =====================================================
 
+// ===== viewport height fallback cho mobile & WebView =====
+(function () {
+  const setVh = () => {
+    const h = (window.visualViewport?.height || window.innerHeight) * 0.01;
+    document.documentElement.style.setProperty('--vh', `${h}px`);
+  };
+  setVh();
+
+  // Thay đổi chiều cao thực khi xoay máy / URL bar co-giãn / bàn phím
+  window.addEventListener('resize', setVh, { passive: true });
+  window.addEventListener('orientationchange', setVh, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setVh, { passive: true });
+  }
+  // iOS Safari khi quay lại từ bfcache
+  window.addEventListener('pageshow', (e) => { if (e.persisted) setVh(); }, { passive: true });
+})();
+
 (function() {
     'use strict';
 
